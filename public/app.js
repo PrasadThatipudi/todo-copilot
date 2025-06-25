@@ -16,8 +16,10 @@ function renderTodos(todos) {
   todos.forEach((todo) => {
     const div = document.createElement("div");
     div.className = "todo-item";
+    div.setAttribute("data-id", todo.id);
+    div.style.cursor = "pointer";
     div.innerHTML = `
-      <span style="${
+      <span class="todo-text" style="${
         todo.done ? "text-decoration:line-through;color:gray;" : ""
       }">${todo.text}</span>
       <span style="margin-left:10px;color:#888;font-size:0.9em;">${
@@ -25,13 +27,13 @@ function renderTodos(todos) {
           ? `⏰ ${new Date(todo.scheduledAt).toLocaleString()}`
           : ""
       }</span>
-      <button data-id="${todo.id}" class="done-btn" ${
-      todo.done ? "disabled" : ""
-    }>Done</button>
-      <button data-id="${todo.id}" class="delete-btn">Delete</button>
+      <button data-id="${
+        todo.id
+      }" class="delete-btn" style="float:right;">Delete</button>
     `;
-    if (todo.reminder && !todo.done) {
-      div.innerHTML += `<span style='color:#e67e22;margin-left:8px;'>🔔 Reminder set</span>`;
+    // Only show bell if reminder is set and not done and not notified
+    if (todo.reminder && !todo.done && todo.id !== globalThis.lastNotifiedId) {
+      div.innerHTML += `<span class='reminder-bell' style='color:#e67e22;margin-left:8px;'>🔔</span>`;
     }
     list.appendChild(div);
   });
@@ -64,22 +66,67 @@ document.getElementById("todo-form").addEventListener("submit", async (e) => {
     reminderInput.checked = false;
     document.getElementById("error-message").textContent = "";
     await refreshTodos();
-  } catch (err) {
+  } catch (_err) {
     document.getElementById("error-message").textContent =
       "Failed to add todo.";
   }
 });
 
 document.getElementById("todo-list").addEventListener("click", async (e) => {
-  if (e.target.classList.contains("done-btn")) {
-    const id = e.target.getAttribute("data-id");
-    await fetch(`${API_URL}/${id}/done`, { method: "PATCH" });
-    await refreshTodos();
-  } else if (e.target.classList.contains("delete-btn")) {
+  // Delete button
+  if (e.target.classList.contains("delete-btn")) {
     const id = e.target.getAttribute("data-id");
     await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+    await refreshTodos();
+    return;
+  }
+  // Mark as done by clicking anywhere on the task except delete button
+  let target = e.target;
+  while (target && !target.classList.contains("todo-item")) {
+    target = target.parentElement;
+  }
+  if (target && target.classList.contains("todo-item")) {
+    const id = target.getAttribute("data-id");
+    await fetch(`${API_URL}/${id}/done`, { method: "PATCH" });
     await refreshTodos();
   }
 });
 
+// Notification polling: check for next reminder and show browser notification
+let lastNotifiedId = null;
+async function pollReminders() {
+  if (typeof globalThis === "undefined" || typeof Notification === "undefined")
+    return;
+  if (Notification.permission !== "granted") {
+    await Notification.requestPermission();
+  }
+  setInterval(async () => {
+    try {
+      const res = await fetch("/api/todos/next-reminder");
+      const { next } = await res.json();
+      if (next && next.scheduledAt) {
+        const scheduledTime = new Date(next.scheduledAt).getTime();
+        const now = Date.now();
+        // Only notify if not already notified for this todo
+        if (
+          Math.abs(scheduledTime - now) <= 30000 &&
+          lastNotifiedId !== next.id
+        ) {
+          if (Notification.permission === "granted") {
+            new Notification("TODO Reminder", {
+              body: `${next.text} (scheduled for ${new Date(
+                next.scheduledAt
+              ).toLocaleString()})`,
+            });
+            lastNotifiedId = next.id;
+          }
+        }
+      }
+    } catch (_err) {
+      // Ignore polling errors
+    }
+  }, 10000); // poll every 10 seconds
+}
+
+pollReminders();
 refreshTodos();

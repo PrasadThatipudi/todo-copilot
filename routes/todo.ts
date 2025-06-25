@@ -1,4 +1,4 @@
-import { Hono } from "https://deno.land/x/hono/mod.ts";
+import { Hono } from "https://deno.land/x/hono@v4.3.11/mod.ts";
 
 // In-memory store for todos
 let todos: Array<{
@@ -65,4 +65,28 @@ todoRoutes.get("/reminders/due", (c) => {
       t.reminder && t.scheduledAt && !t.done && new Date(t.scheduledAt) <= now
   );
   return c.json({ due });
+});
+
+// --- Notification polling endpoint for frontend ---
+// Returns the next due reminder (if any) for the current user
+// GET /api/todos/next-reminder
+// This is a simple demo; in a real app, use user/session info
+
+todoRoutes.get("/next-reminder", (c) => {
+  const now = new Date();
+  // Find the next reminder that is due or overdue and not done
+  const next = todos
+    .filter(
+      (t) =>
+        t.reminder &&
+        t.scheduledAt &&
+        !t.done &&
+        new Date(t.scheduledAt) <= now &&
+        new Date(t.scheduledAt) > new Date(now.getTime() - 60000)
+    )
+    .sort(
+      (a, b) =>
+        new Date(a.scheduledAt!).getTime() - new Date(b.scheduledAt!).getTime()
+    )[0];
+  return c.json({ next });
 });

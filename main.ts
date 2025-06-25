@@ -1,14 +1,15 @@
-import { Hono } from "https://deno.land/x/hono/mod.ts";
-import { serveStatic } from "https://deno.land/x/hono/middleware.ts";
+import { Hono } from "https://deno.land/x/hono@v4.3.11/mod.ts";
+import { serveStatic } from "https://deno.land/x/hono@v4.3.11/middleware.ts";
+import { logger } from "https://deno.land/x/hono@v4.3.11/middleware.ts";
 import { todoRoutes } from "./routes/todo.ts";
 
 const app = new Hono();
 
-// Serve static files from /public
-app.use("/*", serveStatic({ root: "./public" }));
-
+// Match API routes before static files
+app.use(logger());
 app.route("/api/todos", todoRoutes);
 
-app.get("/", (c) => c.text("TODO App Backend Running!"));
+// Serve static files from /public
+app.use("/*", serveStatic({ root: "./public" }));
 
 Deno.serve(app.fetch);
