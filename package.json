@@ -4,7 +4,8 @@
   "description": "A modern TODO application using Typescript, Javascript, HTML, CSS, and the Hono framework. Built with TDD methodology.",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "start": "ts-node src/server.ts"
   },
   "repository": {
     "type": "git",
