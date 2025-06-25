@@ -26,10 +26,21 @@ body {
   position: relative;
   min-height: 2.3rem;
   font-size: 1.1rem;
+  cursor: pointer;
 }
 .todo-item:hover {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   border-color: #bdbdbd;
+}
+.todo-item.done {
+  background: #f0f0f0;
+  color: #888;
+  text-decoration: line-through;
+}
+.todo-item.undone {
+  background: #fff;
+  color: #222;
+  text-decoration: none;
 }
 .todo-text {
   flex: 1;

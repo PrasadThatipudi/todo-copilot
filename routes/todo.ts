@@ -49,6 +49,16 @@ todoRoutes.patch(":id/done", (c) => {
   return c.json(todo);
 });
 
+// Toggle todo done/undone
+// PATCH /api/todos/:id/toggle
+todoRoutes.patch(":id/toggle", (c) => {
+  const id = Number(c.req.param("id"));
+  const todo = todos.find((t) => t.id === id);
+  if (!todo) return c.json({ error: "Not found" }, 404);
+  todo.done = !todo.done;
+  return c.json(todo);
+});
+
 // Delete a todo
 // DELETE /api/todos/:id
 todoRoutes.delete(":id", (c) => {

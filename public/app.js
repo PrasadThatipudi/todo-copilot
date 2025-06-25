@@ -15,13 +15,11 @@ function renderTodos(todos) {
   }
   todos.forEach((todo) => {
     const div = document.createElement("div");
-    div.className = "todo-item";
+    div.className = `todo-item ${todo.done ? "done" : "undone"}`;
     div.setAttribute("data-id", todo.id);
     div.style.cursor = "pointer";
     div.innerHTML = `
-      <span class="todo-text" style="${
-        todo.done ? "text-decoration:line-through;color:gray;" : ""
-      }">${todo.text}</span>
+      <span class="todo-text">${todo.text}</span>
       <span style="margin-left:10px;color:#888;font-size:0.9em;">${
         todo.scheduledAt
           ? `⏰ ${new Date(todo.scheduledAt).toLocaleString()}`
@@ -48,12 +46,12 @@ document.getElementById("todo-form").addEventListener("submit", async (e) => {
   e.preventDefault();
   const input = document.getElementById("todo-input");
   const scheduleInput = document.getElementById("todo-schedule");
-  const reminderInput = document.getElementById("todo-reminder");
   const text = input.value.trim();
   const scheduledAt = scheduleInput.value
     ? new Date(scheduleInput.value).toISOString()
     : null;
-  const reminder = reminderInput.checked;
+  // If scheduled, reminder is true; otherwise, false
+  const reminder = !!scheduledAt;
   if (!text) return;
   try {
     await fetch(API_URL, {
@@ -63,7 +61,6 @@ document.getElementById("todo-form").addEventListener("submit", async (e) => {
     });
     input.value = "";
     scheduleInput.value = "";
-    reminderInput.checked = false;
     document.getElementById("error-message").textContent = "";
     await refreshTodos();
   } catch (_err) {
@@ -80,14 +77,14 @@ document.getElementById("todo-list").addEventListener("click", async (e) => {
     await refreshTodos();
     return;
   }
-  // Mark as done by clicking anywhere on the task except delete button
+  // Toggle done/undone by clicking anywhere on the task except delete button
   let target = e.target;
   while (target && !target.classList.contains("todo-item")) {
     target = target.parentElement;
   }
   if (target && target.classList.contains("todo-item")) {
     const id = target.getAttribute("data-id");
-    await fetch(`${API_URL}/${id}/done`, { method: "PATCH" });
+    await fetch(`${API_URL}/${id}/toggle`, { method: "PATCH" });
     await refreshTodos();
   }
 });

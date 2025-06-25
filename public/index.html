@@ -7,6 +7,12 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
+    <script>
+      // Redirect to login if not logged in
+      if (!localStorage.getItem("todo-username")) {
+        globalThis.location.href = "login.html";
+      }
+    </script>
     <div id="app">
       <h1>TODO Application</h1>
       <form id="todo-form" autocomplete="off" style="margin-bottom: 1.5rem">
@@ -21,9 +27,6 @@
           id="todo-schedule"
           placeholder="Schedule (optional)"
         />
-        <label style="font-size: 0.95em; margin-left: 8px">
-          <input type="checkbox" id="todo-reminder" /> Reminder
-        </label>
         <button type="submit">Add</button>
       </form>
       <div id="todo-list"></div>
