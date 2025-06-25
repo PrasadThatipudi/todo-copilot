@@ -1,0 +1,51 @@
+{
+  "scriptId": "333",
+  "url": "file:///Users/tatipudiprasad/learning-space/git-hub-copilot/projects/todo-copilot/tests/todo_test.ts",
+  "functions": [
+    {
+      "functionName": "",
+      "ranges": [{ "startOffset": 0, "endOffset": 3421, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "createApp",
+      "ranges": [{ "startOffset": 177, "endOffset": 280, "count": 6 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "resetTodos",
+      "ranges": [{ "startOffset": 281, "endOffset": 387, "count": 6 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "",
+      "ranges": [{ "startOffset": 445, "endOffset": 622, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "",
+      "ranges": [{ "startOffset": 666, "endOffset": 1260, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "",
+      "ranges": [{ "startOffset": 1321, "endOffset": 2023, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "",
+      "ranges": [{ "startOffset": 2076, "endOffset": 2764, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "",
+      "ranges": [{ "startOffset": 2835, "endOffset": 3090, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "",
+      "ranges": [{ "startOffset": 3172, "endOffset": 3418, "count": 1 }],
+      "isBlockCoverage": true
+    }
+  ]
+}

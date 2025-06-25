@@ -1,0 +1,21 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Run Deno Server",
+      "type": "shell",
+      "command": "deno run -A main.ts",
+      "group": "build",
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "Test",
+      "type": "shell",
+      "command": "deno test",
+      "group": "test",
+      "isBackground": false,
+      "problemMatcher": []
+    }
+  ]
+}
