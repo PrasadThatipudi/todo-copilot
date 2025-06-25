@@ -53,6 +53,30 @@ describe("TODO API", () => {
     expect(res.status).toBe(201);
     expect(res.body.title).toBe("Test Todo");
     expect(res.body.status).toBe("undone");
+    expect(Array.isArray(res.body.tasks)).toBe(true);
+    expect(res.body.tasks.length).toBe(0);
+  });
+
+  it("should add a task to an existing todo", async () => {
+    // Create a todo first
+    const todoRes = await request(server)
+      .post("/todos")
+      .send({ title: "Todo with tasks", description: "desc" })
+      .set("Content-Type", "application/json");
+    const todoId = todoRes.body.id;
+    // Add a task
+    const taskRes = await request(server)
+      .post(`/todos/${todoId}/tasks`)
+      .send({ task: "Task 1" })
+      .set("Content-Type", "application/json");
+    expect(taskRes.status).toBe(201);
+    expect(taskRes.body.title).toBe("Task 1");
+    expect(taskRes.body.status).toBe("undone");
+    // Check if the task is in the todo
+    const listRes = await request(server).get("/todos");
+    const todo = listRes.body.find((t: any) => t.id === todoId);
+    expect(todo.tasks.length).toBe(1);
+    expect(todo.tasks[0].title).toBe("Task 1");
   });
 
   it("should list all todos", async () => {

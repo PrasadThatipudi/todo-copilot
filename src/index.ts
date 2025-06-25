@@ -18,9 +18,21 @@ app.post("/todos", async (c) => {
     description,
     status: "undone",
     deleted: false,
+    tasks: [],
   };
   todos.push(todo);
   return c.json(todo, 201);
+});
+
+// Add a task to an existing todo
+app.post("/todos/:id/tasks", async (c) => {
+  const id = Number(c.req.param("id"));
+  const { task } = await c.req.json();
+  const todo = todos.find((t) => t.id === id && !t.deleted);
+  if (!todo) return c.json({ error: "Todo not found" }, 404);
+  const taskObj = { id: todo.tasks.length + 1, title: task, status: "undone" };
+  todo.tasks.push(taskObj);
+  return c.json(taskObj, 201);
 });
 
 app.get("/", (c) => c.text("TODO App API is running!"));

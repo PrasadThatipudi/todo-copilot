@@ -1,0 +1,88 @@
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: #f4f6fb;
+  margin: 0;
+  padding: 0;
+}
+.container {
+  max-width: 600px;
+  margin: 40px auto;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 32px 24px 24px 24px;
+}
+h1 {
+  text-align: center;
+  color: #2d3a4b;
+}
+#todo-form {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+#todo-form input {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+}
+#todo-form button {
+  padding: 8px 16px;
+  background: #4f8cff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+#todo-form button:hover {
+  background: #2563eb;
+}
+.todo {
+  background: #f1f5f9;
+  margin-bottom: 16px;
+  padding: 16px;
+  border-radius: 6px;
+}
+.todo-title {
+  font-weight: bold;
+  font-size: 1.1em;
+  margin-bottom: 8px;
+}
+.tasks {
+  list-style: none;
+  padding: 0 0 0 16px;
+}
+.tasks li {
+  background: #e0e7ef;
+  margin-bottom: 6px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.add-task-form {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+.add-task-form input {
+  flex: 1;
+  padding: 6px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+}
+.add-task-form button {
+  padding: 6px 12px;
+  background: #22c55e;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.add-task-form button:hover {
+  background: #16a34a;
+}
