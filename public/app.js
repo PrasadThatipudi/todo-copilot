@@ -45,27 +45,23 @@ async function refreshTodos() {
 document.getElementById("todo-form").addEventListener("submit", async (e) => {
   e.preventDefault();
   const input = document.getElementById("todo-input");
+  const scheduleInput = document.getElementById("todo-schedule");
+  const reminderInput = document.getElementById("todo-reminder");
   const text = input.value.trim();
+  const scheduledAt = scheduleInput.value
+    ? new Date(scheduleInput.value).toISOString()
+    : null;
+  const reminder = reminderInput.checked;
   if (!text) return;
-  // Scheduling and reminder fields
-  const scheduledAt = prompt(
-    "Schedule for (YYYY-MM-DD HH:mm, leave blank for none):"
-  );
-  let reminder = false;
-  if (scheduledAt) {
-    reminder = confirm("Set a reminder for this scheduled todo?");
-  }
   try {
     await fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        text,
-        scheduledAt: scheduledAt || null,
-        reminder,
-      }),
+      body: JSON.stringify({ text, scheduledAt, reminder }),
     });
     input.value = "";
+    scheduleInput.value = "";
+    reminderInput.checked = false;
     document.getElementById("error-message").textContent = "";
     await refreshTodos();
   } catch (err) {

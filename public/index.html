@@ -17,6 +17,14 @@
           placeholder="Add a new todo..."
           required
         />
+        <input
+          type="datetime-local"
+          id="todo-schedule"
+          placeholder="Schedule (optional)"
+        />
+        <label style="font-size: 0.95em; margin-left: 8px">
+          <input type="checkbox" id="todo-reminder" /> Reminder
+        </label>
         <button type="submit">Add</button>
       </form>
       <div id="error-message" style="color: red; margin-top: 10px"></div>
