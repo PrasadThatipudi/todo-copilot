@@ -10,7 +10,7 @@
     <div id="app">
       <h1>TODO Application</h1>
       <div id="todo-list"></div>
-      <form id="todo-form">
+      <form id="todo-form" autocomplete="off">
         <input
           type="text"
           id="todo-input"
@@ -19,6 +19,7 @@
         />
         <button type="submit">Add</button>
       </form>
+      <div id="error-message" style="color: red; margin-top: 10px"></div>
     </div>
     <script src="app.js"></script>
   </body>
