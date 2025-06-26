@@ -113,6 +113,33 @@
         ) {
           const todos = Array.from(document.querySelectorAll(".todo-item"));
           const idx = todos.indexOf(document.activeElement);
+          // Cmd+Delete: delete current task and focus next (or last)
+          if (e.metaKey && e.key === "Backspace") {
+            e.preventDefault();
+            const current = todos[idx];
+            const delBtn = current.querySelector(".delete-btn");
+            if (delBtn) {
+              // Listen for DOM change to refocus
+              const onListChange = () => {
+                const newTodos = Array.from(
+                  document.querySelectorAll(".todo-item")
+                );
+                if (newTodos.length === 0) return;
+                if (idx < newTodos.length) {
+                  newTodos[idx].focus();
+                } else {
+                  newTodos[newTodos.length - 1].focus();
+                }
+                observer.disconnect();
+              };
+              const observer = new MutationObserver(onListChange);
+              observer.observe(document.getElementById("todo-list"), {
+                childList: true,
+              });
+              delBtn.click();
+            }
+            return;
+          }
           // ArrowDown, Ctrl+N, or J
           if (
             e.key === "ArrowDown" ||
@@ -129,7 +156,6 @@
               // Wrap to first
               todos[0].focus();
             }
-            // ArrowUp, Ctrl+P, or K
           } else if (
             e.key === "ArrowUp" ||
             (e.ctrlKey && e.key.toLowerCase() === "p") ||
