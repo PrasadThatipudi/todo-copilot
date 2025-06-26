@@ -1,32 +1,46 @@
-import { Hono } from "https://deno.land/x/hono@v4.3.11/mod.ts";
+import { Context, Hono } from "https://deno.land/x/hono@v4.3.11/mod.ts";
 
-// In-memory store for todos
-let todos: Array<{
+// In-memory store for todos per user
+interface Todo {
   id: number;
   text: string;
   done: boolean;
   scheduledAt?: string | null;
   reminder?: boolean;
-}> = [];
+}
+const userTodos: Record<string, Todo[]> = {};
 let nextId = 1;
+
+function getUsernameFromCookie(c: Context): string | null {
+  const cookie = c.req.header("cookie") || "";
+  const match = cookie.match(/(?:^|; )todo-username=([^;]*)/);
+  return match ? decodeURIComponent(match[1]) : null;
+}
 
 export const todoRoutes = new Hono();
 
 // For testing: reset state
 if (Deno.env.get("DENO_ENV") === "test") {
-  todoRoutes.post("/test/reset", async (c) => {
-    todos = [];
+  todoRoutes.post("/test/reset", (c) => {
+    Object.keys(userTodos).forEach((k) => delete userTodos[k]);
     nextId = 1;
     return c.json({ success: true });
   });
 }
 
-// Get all todos
-todoRoutes.get("/", (c) => c.json({ todos }));
+// Get all todos for user
+todoRoutes.get("/", (c) => {
+  const username = getUsernameFromCookie(c);
+  if (!username) return c.json({ error: "Unauthorized" }, 401);
+  const todos = userTodos[username] || [];
+  return c.json({ todos });
+});
 
-// Add a new todo
+// Add a new todo for user
 // POST /api/todos { text: string, scheduledAt?: string, reminder?: boolean }
 todoRoutes.post("/", async (c) => {
+  const username = getUsernameFromCookie(c);
+  if (!username) return c.json({ error: "Unauthorized" }, 401);
   const { text, scheduledAt, reminder } = await c.req.json();
   const todo = {
     id: nextId++,
@@ -35,13 +49,17 @@ todoRoutes.post("/", async (c) => {
     scheduledAt: scheduledAt || null,
     reminder: !!reminder,
   };
-  todos.push(todo);
+  if (!userTodos[username]) userTodos[username] = [];
+  userTodos[username].push(todo);
   return c.json(todo, 201);
 });
 
-// Mark todo as done
+// Mark todo as done for user
 // PATCH /api/todos/:id/done
 todoRoutes.patch(":id/done", (c) => {
+  const username = getUsernameFromCookie(c);
+  if (!username) return c.json({ error: "Unauthorized" }, 401);
+  const todos = userTodos[username] || [];
   const id = Number(c.req.param("id"));
   const todo = todos.find((t) => t.id === id);
   if (!todo) return c.json({ error: "Not found" }, 404);
@@ -49,9 +67,12 @@ todoRoutes.patch(":id/done", (c) => {
   return c.json(todo);
 });
 
-// Toggle todo done/undone
+// Toggle todo done/undone for user
 // PATCH /api/todos/:id/toggle
 todoRoutes.patch(":id/toggle", (c) => {
+  const username = getUsernameFromCookie(c);
+  if (!username) return c.json({ error: "Unauthorized" }, 401);
+  const todos = userTodos[username] || [];
   const id = Number(c.req.param("id"));
   const todo = todos.find((t) => t.id === id);
   if (!todo) return c.json({ error: "Not found" }, 404);
@@ -59,17 +80,25 @@ todoRoutes.patch(":id/toggle", (c) => {
   return c.json(todo);
 });
 
-// Delete a todo
+// Delete a todo for user
 // DELETE /api/todos/:id
 todoRoutes.delete(":id", (c) => {
+  const username = getUsernameFromCookie(c);
+  if (!username) return c.json({ error: "Unauthorized" }, 401);
+  let todos = userTodos[username] || [];
   const id = Number(c.req.param("id"));
   todos = todos.filter((t) => t.id !== id);
+  userTodos[username] = todos;
   return c.json({ success: true });
 });
 
-// (Optional) Endpoint to get todos with reminders due soon (for future notification logic)
+// Reminders due soon for user
+// GET /api/todos/reminders/due
 todoRoutes.get("/reminders/due", (c) => {
+  const username = getUsernameFromCookie(c);
+  if (!username) return c.json({ error: "Unauthorized" }, 401);
   const now = new Date();
+  const todos = userTodos[username] || [];
   const due = todos.filter(
     (t) =>
       t.reminder && t.scheduledAt && !t.done && new Date(t.scheduledAt) <= now
@@ -83,8 +112,10 @@ todoRoutes.get("/reminders/due", (c) => {
 // This is a simple demo; in a real app, use user/session info
 
 todoRoutes.get("/next-reminder", (c) => {
+  const username = getUsernameFromCookie(c);
+  if (!username) return c.json({ error: "Unauthorized" }, 401);
   const now = new Date();
-  // Find the next reminder that is due or overdue and not done
+  const todos = userTodos[username] || [];
   const next = todos
     .filter(
       (t) =>

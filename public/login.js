@@ -8,12 +8,14 @@ document.getElementById("login-form").addEventListener("submit", (e) => {
     errorDiv.textContent = "Please enter both username and password.";
     return;
   }
-  // For demo: just store username in localStorage and redirect
-  localStorage.setItem("todo-username", username);
+  // Set username in cookie (expires in 7 days)
+  document.cookie = `todo-username=${encodeURIComponent(
+    username
+  )}; path=/; max-age=604800`;
   globalThis.location.href = "index.html";
 });
 
 // If already logged in, redirect to main app
-if (localStorage.getItem("todo-username")) {
+if (document.cookie.includes("todo-username=")) {
   globalThis.location.href = "index.html";
 }

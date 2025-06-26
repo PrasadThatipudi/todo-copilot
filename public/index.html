@@ -26,8 +26,14 @@
   </head>
   <body>
     <script>
-      // Redirect to login if not logged in
-      if (!localStorage.getItem("todo-username")) {
+      // Redirect to login if not logged in (using cookie)
+      function getCookie(name) {
+        return document.cookie
+          .split("; ")
+          .find((row) => row.startsWith(name + "="))
+          ?.split("=")[1];
+      }
+      if (!getCookie("todo-username")) {
         globalThis.location.href = "login.html";
       }
     </script>
