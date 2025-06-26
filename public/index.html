@@ -5,6 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TODO App</title>
     <link rel="stylesheet" href="style.css" />
+    <style>
+      /* Ensure delete button is always at the right of each todo item */
+      .todo-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+      }
+      .todo-item .delete-btn {
+        margin-left: auto;
+        order: 2;
+      }
+      /* Optional: keep other icons/text left */
+      .todo-item .bell-icon,
+      .todo-item .reminder-icon {
+        order: 1;
+      }
+    </style>
   </head>
   <body>
     <script>
@@ -95,12 +113,38 @@
         ) {
           const todos = Array.from(document.querySelectorAll(".todo-item"));
           const idx = todos.indexOf(document.activeElement);
-          if (e.key === "ArrowDown") {
+          // ArrowDown, Ctrl+N, or J
+          if (
+            e.key === "ArrowDown" ||
+            (e.ctrlKey && e.key.toLowerCase() === "n") ||
+            (e.key.toLowerCase() === "j" &&
+              !e.ctrlKey &&
+              !e.metaKey &&
+              !e.altKey)
+          ) {
             e.preventDefault();
-            if (idx < todos.length - 1) todos[idx + 1].focus();
-          } else if (e.key === "ArrowUp") {
+            if (idx < todos.length - 1) {
+              todos[idx + 1].focus();
+            } else if (todos.length > 0) {
+              // Wrap to first
+              todos[0].focus();
+            }
+            // ArrowUp, Ctrl+P, or K
+          } else if (
+            e.key === "ArrowUp" ||
+            (e.ctrlKey && e.key.toLowerCase() === "p") ||
+            (e.key.toLowerCase() === "k" &&
+              !e.ctrlKey &&
+              !e.metaKey &&
+              !e.altKey)
+          ) {
             e.preventDefault();
-            if (idx > 0) todos[idx - 1].focus();
+            if (idx > 0) {
+              todos[idx - 1].focus();
+            } else if (todos.length > 0) {
+              // Wrap to last
+              todos[todos.length - 1].focus();
+            }
           }
         }
       });
