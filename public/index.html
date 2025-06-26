@@ -22,6 +22,19 @@
       .todo-item .reminder-icon {
         order: 1;
       }
+      .logout-btn {
+        font-size: 1.1rem;
+        padding: 0.8rem 1rem;
+        border-radius: 6px;
+        background: #1976d2;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .logout-btn:hover {
+        background: #1565c0;
+      }
     </style>
   </head>
   <body>
@@ -39,6 +52,7 @@
     </script>
     <div id="app">
       <h1>TODO Application</h1>
+      <button id="logout-btn" class="logout-btn" style="position:absolute;top:1.5rem;right:2rem;z-index:10;">Logout</button>
       <form id="todo-form" autocomplete="off" style="margin-bottom: 1.5rem">
         <input
           type="text"
@@ -213,6 +227,13 @@
           }
         }
       });
+    </script>
+    <script>
+      // Logout button logic
+      document.getElementById("logout-btn").onclick = function () {
+        document.cookie = "todo-username=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        globalThis.location.href = "login.html";
+      };
     </script>
   </body>
 </html>
