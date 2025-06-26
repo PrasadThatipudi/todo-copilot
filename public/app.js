@@ -63,6 +63,9 @@ document.getElementById("todo-form").addEventListener("submit", async (e) => {
     scheduleInput.value = "";
     document.getElementById("error-message").textContent = "";
     await refreshTodos();
+    // Remove focus from both input and date
+    input.blur();
+    scheduleInput.blur();
   } catch (_err) {
     document.getElementById("error-message").textContent =
       "Failed to add todo.";

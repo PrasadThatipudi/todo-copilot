@@ -21,11 +21,14 @@
           id="todo-input"
           placeholder="Add a new todo..."
           required
+          autocomplete="off"
+          title="⌘ + K"
         />
         <input
           type="datetime-local"
           id="todo-schedule"
           placeholder="Schedule (optional)"
+          autocomplete="off"
         />
         <button type="submit">Add</button>
       </form>
@@ -33,5 +36,74 @@
       <div id="error-message" style="color: red; margin-top: 10px"></div>
     </div>
     <script src="app.js"></script>
+    <script>
+      // UX: Enter in input goes to date, Enter in date submits
+      const todoInput = document.getElementById("todo-input");
+      const todoSchedule = document.getElementById("todo-schedule");
+      todoInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          todoSchedule.focus();
+        }
+      });
+      todoSchedule.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          document.getElementById("todo-form").requestSubmit();
+        }
+      });
+    </script>
+    <script>
+      // UX: Cmd+K focuses the input box
+      document.addEventListener("keydown", (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+          e.preventDefault();
+          const todoInput = document.getElementById("todo-input");
+          if (todoInput) todoInput.focus();
+        }
+      });
+    </script>
+    <script>
+      // Make every todo item focusable and enable keyboard navigation
+      function makeTodosFocusable() {
+        const todos = document.querySelectorAll(".todo-item");
+        todos.forEach((el, i) => {
+          el.setAttribute("tabindex", "0");
+          el.setAttribute("data-idx", i);
+        });
+      }
+      // Observe changes to todo-list to reapply focusable
+      const todoList = document.getElementById("todo-list");
+      const observer = new MutationObserver(makeTodosFocusable);
+      observer.observe(todoList, { childList: true, subtree: false });
+      // Initial call in case todos are already rendered
+      makeTodosFocusable();
+
+      // Ctrl+L focuses the todo list (first item)
+      document.addEventListener("keydown", (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "l") {
+          e.preventDefault();
+          const first = document.querySelector(".todo-item");
+          if (first) first.focus();
+        }
+      });
+      // Arrow key navigation for todo items
+      document.addEventListener("keydown", (e) => {
+        if (
+          document.activeElement &&
+          document.activeElement.classList.contains("todo-item")
+        ) {
+          const todos = Array.from(document.querySelectorAll(".todo-item"));
+          const idx = todos.indexOf(document.activeElement);
+          if (e.key === "ArrowDown") {
+            e.preventDefault();
+            if (idx < todos.length - 1) todos[idx + 1].focus();
+          } else if (e.key === "ArrowUp") {
+            e.preventDefault();
+            if (idx > 0) todos[idx - 1].focus();
+          }
+        }
+      });
+    </script>
   </body>
 </html>
