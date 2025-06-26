@@ -140,6 +140,39 @@
             }
             return;
           }
+          // 't' to toggle current task status and focus next (or last undone)
+          if (
+            e.key.toLowerCase() === "t" &&
+            !e.ctrlKey &&
+            !e.metaKey &&
+            !e.altKey
+          ) {
+            e.preventDefault();
+            const current = todos[idx];
+            // Simulate click to toggle
+            current.click();
+            // Wait for DOM update, then focus next or last undone
+            setTimeout(() => {
+              const newTodos = Array.from(
+                document.querySelectorAll(".todo-item")
+              );
+              // Try to focus next task
+              if (idx < newTodos.length - 1) {
+                newTodos[idx + 1].focus();
+              } else {
+                // Focus last undone task
+                const undone = newTodos.filter(
+                  (t) => !t.classList.contains("done")
+                );
+                if (undone.length > 0) {
+                  undone[undone.length - 1].focus();
+                } else if (newTodos.length > 0) {
+                  newTodos[newTodos.length - 1].focus();
+                }
+              }
+            }, 50);
+            return;
+          }
           // ArrowDown, Ctrl+N, or J
           if (
             e.key === "ArrowDown" ||
