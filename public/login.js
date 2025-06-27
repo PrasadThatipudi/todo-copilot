@@ -1,7 +1,7 @@
 // --- Simple in-memory user store for demo purposes ---
 const USERS_KEY = "todo-demo-users";
 function getUsers() {
-  return JSON.parse(localStorage.getItem(USERS_KEY) || '{}');
+  return JSON.parse(localStorage.getItem(USERS_KEY) || "{}");
 }
 function setUsers(users) {
   localStorage.setItem(USERS_KEY, JSON.stringify(users));
@@ -25,7 +25,7 @@ document.getElementById("signup-form")?.addEventListener("submit", (e) => {
   }
   users[username] = password;
   setUsers(users);
-  errorDiv.style.color = '#388e3c';
+  errorDiv.style.color = "#388e3c";
   errorDiv.textContent = "Signup successful! Please login.";
   setTimeout(() => {
     errorDiv.textContent = "";
